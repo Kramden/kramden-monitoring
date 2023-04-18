@@ -1,9 +1,9 @@
 name: Send Notification
 
 on:
-  # Runs at 10:00 UTC every day
+  # Runs every 5 minutes
   schedule:
-    - cron:  '0 10 * * *'
+    - cron:  '*/5 * * * *'
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
@@ -14,7 +14,12 @@ jobs:
       - name: Should Notify
         id: should-notify
         run: |
-          SHOULD="true"
+          OUTPUT=$(curl -s -o /dev/null -w "%{http_code}" https://landscape.kramden.org/)
+          if [ $OUTPUT == 200 ]; then
+            SHOULD="true"
+          else
+            SHOULD="false"
+          fi
           echo "should=$SHOULD" >> $GITHUB_OUTPUT
 
       - name: Discord notification
@@ -23,4 +28,4 @@ jobs:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         uses: Ilshidur/action-discord@0.3.2
         with:
-          args: 'The project {{ EVENT_PAYLOAD.repository.full_name }} has been deployed.'
+          args: 'The Landscape Server is down at https://landscape.kramden.org'
