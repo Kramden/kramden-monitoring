@@ -28,4 +28,4 @@ jobs:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         uses: Ilshidur/action-discord@0.3.2
         with:
-          args: '<@kenvandine#5775> The Landscape Server is down at https://landscape.kramden.org'
+          args: '@kenvandine#5775 The Landscape Server is down at https://landscape.kramden.org'
