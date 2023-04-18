@@ -26,6 +26,7 @@ jobs:
         if: steps.should-notify.outputs.should == 'true'
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+          DISCORD_USERNAME: "Kramden Monitor"
         uses: Ilshidur/action-discord@0.3.2
         with:
           args: '@kenvandine The Landscape Server is down at https://landscape.kramden.org'
