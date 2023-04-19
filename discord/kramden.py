@@ -28,14 +28,16 @@ async def on_message(message):
         return
 
     if message.content.startswith('-stats'):
-        await message.channel.send(get_stats())
+        embed = discord.Embed(title = "Total Stats for Today:", description = get_stats(), color = 0xFF5733)
+        await message.channel.send(embed = embed)
 
     if message.content.startswith('-up'):
         await message.channel.send('FIXME')
     if message.content.startswith('-help'):
         await message.channel.send(usage)
     if message.content.startswith('-isocheck'):
-        await message.channel.send(mount_status())
+        embed = discord.Embed(title = "ISO Status: ", description = mount_status(), color = 0xFF5733)
+        await message.channel.send(embed = embed)
 
 def get_stats():
     jammy = 0
@@ -59,9 +61,7 @@ def get_stats():
                 if 'memtest' in str(row[4]):
                     memtest = memtest + 1
 
-    
     output = '''\
-Total stats for today:
 Ubuntu 22.04: {jammy}
 Ubuntu 23.04: {lunar}
 Windows: {windows}
@@ -75,21 +75,20 @@ def check_mount(dir_path):
     return os.path.ismount(dir_path)
 
 def mount_status():
-    output = "```\n"
+    output = ""
     lunar_mounted = check_mount(os.path.join(lunarpath, "iso"))
     if not lunar_mounted:
         output += "Ubuntu 23.04 iso is not mounted, to fix:\n\n"
-        output += "sudo mount -o loop %s/lunar-desktop-amd64.iso %s/iso\n\n" %(lunarpath, lunarpath)
+        output += "```fix\nsudo mount -o loop %s/lunar-desktop-amd64.iso %s/iso\n```\n\n" %(lunarpath, lunarpath)
     else:
         output += "Ubuntu 23.04 iso is mounted\n\n"
     
     jammy_mounted = check_mount(os.path.join(jammypath, "iso"))
     if not jammy_mounted:
         output += "Ubuntu 22.04 iso is not mounted, to fix:\n\n"
-        output += "sudo mount -o loop %s/lunar-desktop-amd64.iso %s/iso\n\n" %(jammypath, jammypath)
+        output += "```fix\nsudo mount -o loop %s/lunar-desktop-amd64.iso %s/iso\n```\n\n" %(jammypath, jammypath)
     else:
         output += "Ubuntu 22.04 iso is mounted\n\n"
-    output += "\n```"
     return output
 
 token = os.getenv('KRAMDEN_DISCORD_TOKEN')
@@ -97,4 +96,3 @@ if token:
   client.run(token)
 else:
   print("KRAMDEN_DISCORD_TOKEN environment variable required")
-
