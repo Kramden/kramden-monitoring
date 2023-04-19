@@ -15,7 +15,7 @@ jobs:
         id: should-notify
         run: |
           OUTPUT=$(curl -s -o /dev/null -w "%{http_code}" https://landscape.kramden.org/)
-          if [ $OUTPUT == 200 ]; then
+          if [ $OUTPUT != 200 ]; then
             SHOULD="true"
           else
             SHOULD="false"
