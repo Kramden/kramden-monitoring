@@ -1,5 +1,10 @@
 import os
 import discord
+from lars import apache
+
+basedir="/var/www/html/ubuntu-autoinstall-ipxe"
+lunarpath=os.path.join(basedir, "ubuntu/23.04")
+jammypath=os.path.join(basedir, "ubuntu/22.04")
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -21,6 +26,7 @@ async def on_ready():
 async def on_message(message):
     if message.author == client.user:
         return
+
     if message.content.startswith('-stats'):
         await message.channel.send(get_stats())
 
@@ -28,6 +34,8 @@ async def on_message(message):
         await message.channel.send('FIXME')
     if message.content.startswith('-help'):
         await message.channel.send(usage)
+    if message.content.startswith('-isocheck'):
+        await message.channel.send(mount_status())
 
 def get_stats():
     jammy = 0
@@ -51,6 +59,7 @@ def get_stats():
                 if 'memtest' in str(row[4]):
                     memtest = memtest + 1
 
+    
     output = '''\
 Total stats for today:
 Ubuntu 22.04: {jammy}
@@ -62,8 +71,30 @@ memtest: {memtest}
     print(output)
     return output
 
+def check_mount(dir_path):
+    return os.path.ismount(dir_path)
+
+def mount_status():
+    output = "```\n"
+    lunar_mounted = check_mount(os.path.join(lunarpath, "iso"))
+    if not lunar_mounted:
+        output += "Ubuntu 23.04 iso is not mounted, to fix:\n\n"
+        output += "sudo mount -o loop %s/lunar-desktop-amd64.iso %s/iso\n\n" %(lunarpath, lunarpath)
+    else:
+        output += "Ubuntu 23.04 iso is mounted\n\n"
+    
+    jammy_mounted = check_mount(os.path.join(jammypath, "iso"))
+    if not jammy_mounted:
+        output += "Ubuntu 22.04 iso is not mounted, to fix:\n\n"
+        output += "sudo mount -o loop %s/lunar-desktop-amd64.iso %s/iso\n\n" %(jammypath, jammypath)
+    else:
+        output += "Ubuntu 22.04 iso is mounted\n\n"
+    output += "\n```"
+    return output
+
 token = os.getenv('KRAMDEN_DISCORD_TOKEN')
 if token:
-    client.run(token)
+  client.run(token)
 else:
-    print("KRAMDEN_DISCORD_TOKEN environment variable required")
+  print("KRAMDEN_DISCORD_TOKEN environment variable required")
+
