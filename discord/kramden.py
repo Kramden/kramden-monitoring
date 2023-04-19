@@ -1,7 +1,9 @@
 import os
 import discord
 
-client = discord.Client()
+intents = discord.Intents.default()
+intents.message_content = True
+client = discord.Client(intents=intents)
 
 usage = '''\
 Welcome to the Kramden bot!
