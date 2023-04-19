@@ -15,7 +15,7 @@ jobs:
         id: should-notify
         run: |
           OUTPUT=$(curl -s -o /dev/null -w "%{http_code}" https://landscape.kramden.org/)
-          if [ $OUTPUT != 200 ]; then
+          if [ $OUTPUT == 200 ]; then
             SHOULD="true"
           else
             SHOULD="false"
@@ -29,4 +29,4 @@ jobs:
           DISCORD_USERNAME: "Kramden Monitor"
         uses: Ilshidur/action-discord@0.3.2
         with:
-          args: '@kenvandine The Landscape Server is down at https://landscape.kramden.org'
+          args: 'The Landscape Server is down at https://landscape.kramden.org'
