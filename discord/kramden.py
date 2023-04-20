@@ -1,6 +1,8 @@
 import os
 import discord
+from discord.ext import tasks, commands
 from lars import apache
+import requests
 
 basedir="/var/www/html/ubuntu-autoinstall-ipxe"
 lunarpath=os.path.join(basedir, "ubuntu/23.04")
@@ -20,12 +22,26 @@ Available commands:
 
 @client.event
 async def on_ready():
+    task_loop.start()
     print('We have logged in as {0.user}'.format(client))
+
+@tasks.loop(seconds=30) # '30' is the time interval in seconds.
+async def task_loop():
+    channel = client.get_channel(918622667211415605)
+
+    if check_mounts():
+        embed = discord.Embed(title = "ISO Status: ", description = mount_status(), color = 0xFF5733)
+        await channel.send(embed = embed)
+
+    if not check_apache():
+        embed = discord.Embed(title = "Apache is down: ", description = "Web service is offline", color = 0xFF5733)
+        await channel.send(embed = embed)
 
 @client.event
 async def on_message(message):
     if message.author == client.user:
         return
+    print(message.channel.id)
 
     if message.content.startswith('-stats'):
         embed = discord.Embed(title = "Total Stats for Today:", description = get_stats(), color = 0xFF5733)
@@ -70,6 +86,18 @@ memtest: {memtest}
 '''.format(length='multi-line', ordinal='second', jammy=jammy, lunar=lunar, windows=windows, pmagic=pmagic, memtest=memtest)
     print(output)
     return output
+
+def check_apache():
+  try:
+    response = requests.get("http://192.168.1.254")
+    return response.status_code == 200
+  except:
+      return False
+  return True
+
+def check_mounts():
+    if not check_mount(os.path.join(lunarpath, "iso")) or not check_mount(os.path.join(jammypath, "iso")):
+        return True
 
 def check_mount(dir_path):
     return os.path.ismount(dir_path)
