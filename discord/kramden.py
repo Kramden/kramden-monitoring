@@ -121,6 +121,6 @@ def mount_status():
 
 token = os.getenv('KRAMDEN_DISCORD_TOKEN')
 if token:
-  client.run(token)
+    client.run(token)
 else:
-  print("KRAMDEN_DISCORD_TOKEN environment variable required")
+    print("KRAMDEN_DISCORD_TOKEN environment variable required")
