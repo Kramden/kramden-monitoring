@@ -16,8 +16,8 @@ usage = '''\
 Welcome to the Kramden bot!
 
 Available commands:
-    -stats 
-    -up
+    $stats
+    $isocheck
 '''.format(length='multi-line', ordinal='second')
 
 @client.event
@@ -27,7 +27,7 @@ async def on_ready():
 
 @tasks.loop(seconds=30) # '30' is the time interval in seconds.
 async def task_loop():
-    channel = client.get_channel(918622667211415605)
+    channel = client.get_channel(1098262455857205360)
 
     if check_mounts():
         embed = discord.Embed(title = "ISO Status: ", description = mount_status(), color = 0xFF5733)
@@ -42,16 +42,14 @@ async def on_message(message):
     if message.author == client.user:
         return
     print(message.channel.id)
+    print(message.content)
 
-    if message.content.startswith('-stats'):
+    if message.content.startswith('$stats'):
         embed = discord.Embed(title = "Total Stats for Today:", description = get_stats(), color = 0xFF5733)
         await message.channel.send(embed = embed)
-
-    if message.content.startswith('-up'):
-        await message.channel.send('FIXME')
-    if message.content.startswith('-help'):
+    if message.content.startswith('$help'):
         await message.channel.send(usage)
-    if message.content.startswith('-isocheck'):
+    if message.content.startswith('$isocheck'):
         embed = discord.Embed(title = "ISO Status: ", description = mount_status(), color = 0xFF5733)
         await message.channel.send(embed = embed)
 
